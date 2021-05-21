@@ -1,13 +1,15 @@
 import sqlite3
 import ModTags as MTags
-try:
-    def ConnectBase():
-        conn = sqlite3.connect('Music.db')
-        # conn = sqlite3.connect(r'D:\Music.db')    
+# dbName = 'Music.db'
+# tbName = 'Tracks'
 
-        cur = conn.cursor()
-        cur.execute("""DROP TABLE IF EXISTS Tracks; """)
-        cur.execute("""
+def GreateTable() -> str:
+    GT = ()
+    try:
+        conn = sqlite3.connect('Music.db')
+        # cur = conn.cursor()
+        conn.execute("""DROP TABLE IF EXISTS Tracks; """)
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS Tracks(
             Id INTEGER PRIMARY KEY AUTOINCREMENT 
             , Artist      TEXT 
@@ -21,32 +23,48 @@ try:
             , DateInsert  CURRENT_TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
             );
             """)
+    except sqlite3.Warning as Warn: 
+        print(Warn)
+    except sqlite3.Error as DErr:
+        GT = DErr
+    else:
         conn.commit()
-          # RealTime DateTime2(0) Not NULL default CURRENT_TIMESTAMP  
-        return conn
+        conn.close()         
+        GT = 'Ok'
+    # finally:    
+        # print (Warn)
+    return GT
         
-    def InsertBase(Conn,Tags):
-    
-        cur = Conn.cursor()    
-        cur.execute("INSERT INTO Tracks(Artist, Title, Locale, Genre, TrackNum, TrackTell, FileName, MessErr) VALUES(?,?,?,?,?,?,?,?);"
+def InsertBase(Tags):
+    IB = ''
+    try:    
+        conn = sqlite3.connect('Music.db')    
+        # cur = Conn.cursor()    
+        conn.execute("INSERT INTO Tracks(Artist, Title, Locale, Genre, TrackNum, TrackTell, FileName, MessErr) VALUES(?,?,?,?,?,?,?,?);"
         ,(Tags.get('Artist',''), Tags.get('Title',''), Tags.get('Locale',''), Tags.get('Genre',''), Tags.get('TrackNum',''), Tags.get('TrackTell',''), Tags.get('FileName',''), Tags.get('MessErr','')))
-        Conn.commit() 
-        DataErr = sqlite3.DatabaseError.message
-        print(DataErr)
-        return
+        conn.commit() 
+    except sqlite3.Warning as Warn: 
+        print(Warn)
+    except sqlite3.Error as DErr:
+        IB = DErr
+    else:
+        conn.commit()
+        conn.close()         
+        IB = 'Ok'
+    # finally:    
+        # print (Warn)
+    return
 
-except sqlite3.DatabaseError as DataErr:
-    print ("Ошибка Базы:" + str(DataErr))   
 
 if __name__ == '__main__':
     print ("Тест модуля работы SQL Lite ")
-    Cn = ConnectBase()
-    Tn = MTags.ReadFileTags('','МКПН - Патиритилап.flac')
-    # print(Tn['Artist'], Tn['Title'])
-    InsertBase(Cn, Tn)
-    Tn = MTags.ReadFileTags('','Валевская Н - Гага.mp3') 
-    InsertBase(Cn, Tn)   
-    Tn =  MTags.ReadFileTags('','Moscow Calling.mp3')     
-    InsertBase(Cn, Tn)    
+    Tn = GreateTable()
+    if Tn =='Ok':
+        InsertBase(MTags.ReadFileTags('','МКПН - Патиритилап.flac'))
+        InsertBase(MTags.ReadFileTags('','Валевская Н - Гага.mp3'))   
+        InsertBase(MTags.ReadFileTags('','Moscow Calling.mp3'))    
+    else:
+        print('Проблемы с созданием базы/таблицы', Tn)
+    
     # print (Cn)
-    Cn.close()
+    # 
