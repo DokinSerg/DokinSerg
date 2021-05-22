@@ -36,7 +36,6 @@ def ReadFlac(Fn):
         buff  = Fn.read(LineSize) # Читаем "вектор слова 
         LineStr = buff.decode() # декодируем байтовую стоку в текст Genre
         LineStr = LineStr.title() # строка с заглавной буквы
-        #assert len(LineStr) == 0,  buff
         if LineStr.startswith('Artist='):
             tstr = LineStr.removeprefix('Artist=')
             FileStruckt['Artist'] = tstr.title()
@@ -94,7 +93,6 @@ def ReadID3(Fn):
     Ct =int.from_bytes(Tbuff + b'\x00', byteorder = 'big') >> 1   
     Tbuff = Fn.read(1)  # 4-й, младший байт размера
     Dt =int.from_bytes(Tbuff , byteorder = 'big')  
-    #print (Tbuff,Tbuff + b'\x00',Dt, Dt.to_bytes(4, 'big').hex(' ') )   
     Dt = Dt + Ct + Bt + At - 10
     It = 0
     while It <= Dt:
@@ -116,10 +114,8 @@ def ReadID3(Fn):
             Tmp = TagDecode(buff).split(sep = '/', maxsplit = 1)
             FileStruckt['TrackNum']  = int(Tmp[0])
             FileStruckt['TrackTell'] = TrTell          
-            continue            
-        # if LineStr in ( 'TALB','TIT1', 'TIT3', 'TPE3',  ):  # Анализ заголовка
-            # print(LineStr,'/',offset, ' = ', TagDecode(buff)) #  ): 
-            # continue
+            continue   
+            
     if (not (('Artist' in FileStruckt) and ('Title'in FileStruckt) and ('TrackNum' in FileStruckt))):        
         Fn.seek(-128, 2)    
         Tbuff = Fn.read(3)
@@ -130,7 +126,6 @@ def ReadID3(Fn):
             if 'Title' not in FileStruckt:
                 Tt = buff.strip(b'\x00')     
                 FileStruckt['Title'] = buff.decode('cp1251')
-                #print (Fn.tell().to_bytes(4, 'big').hex(' '),' = ',Tt.decode('cp1251'))   
             buff = Fn.read(30)
             if 'Artist' not in FileStruckt:
                 Tt = buff.strip(b'\x00')    
@@ -179,7 +174,6 @@ def WriteFlac(PathName: str, FlName: str, FileStruckt: dict ) -> dict():
 
 if __name__ == '__main__':
     print ("Тест функция ReadFlac() ")
-    print (ReadFileTags('','МКПН - Патиритилап.flac'))
     print (ReadFileTags('','Валевская Н - Гага.mp3'))   
     print (ReadFileTags('','Moscow Calling.mp3'))      
     print ("Функции WriteFlac() не готова")    

@@ -24,7 +24,7 @@ def GreateTable() -> str:
             );
             """)
     except sqlite3.Warning as Warn: 
-        print(Warn)
+        GT = Warn
     except sqlite3.Error as DErr:
         GT = DErr
     else:
@@ -35,7 +35,7 @@ def GreateTable() -> str:
         # print (Warn)
     return GT
         
-def InsertBase(Tags):
+def InsertBase(Tags) ->str :
     IB = ''
     try:    
         conn = sqlite3.connect('Music.db')    
@@ -44,7 +44,7 @@ def InsertBase(Tags):
         ,(Tags.get('Artist',''), Tags.get('Title',''), Tags.get('Locale',''), Tags.get('Genre',''), Tags.get('TrackNum',''), Tags.get('TrackTell',''), Tags.get('FileName',''), Tags.get('MessErr','')))
         conn.commit() 
     except sqlite3.Warning as Warn: 
-        print(Warn)
+       IB = Warn
     except sqlite3.Error as DErr:
         IB = DErr
     else:
@@ -53,18 +53,14 @@ def InsertBase(Tags):
         IB = 'Ok'
     # finally:    
         # print (Warn)
-    return
-
+    return IB
 
 if __name__ == '__main__':
     print ("Тест модуля работы SQL Lite ")
     Tn = GreateTable()
     if Tn =='Ok':
-        InsertBase(MTags.ReadFileTags('','МКПН - Патиритилап.flac'))
         InsertBase(MTags.ReadFileTags('','Валевская Н - Гага.mp3'))   
         InsertBase(MTags.ReadFileTags('','Moscow Calling.mp3'))    
     else:
         print('Проблемы с созданием базы/таблицы', Tn)
     
-    # print (Cn)
-    # 
